@@ -10,17 +10,44 @@
   white  : true
 */
 
-/* global $, spa */
+/* global $, spa, getComputedStyle */
 
 spa.chat = (function () {
   // ---------------- BEGIN MODULE SCOPE VARIABLES ----------------
   var
     configMap = {
       main_html : String()
-        + '<div style="padding:1em; color:#fff;">'
-        +   'Say hello to chat'
+        + '<div class="spa-chat">'
+        +   '<div class="spa-chat-head">'
+        +     '<div class="spa-chat-head-toggle"></div>'
+        +     '<div class="spa-chat-head-title">'
+        +       'Chat'
+        +     '</div>'
+        +   '</div>'
+        +   '<div class="spa-chat-closer">x</div>'
+        +   '<div class="spa-chat-size">'
+        +     '<div class="spa-chat-msgs"></div>'
+        +     '<div class="spa-chat-box">'
+        +       '<input type="text">'
+        +       '<div>send</div>'
+        +     '</div>'
+        +   '</div>'
         + '</div>',
-      settable_map : {}
+
+      settable_map : {
+        slider_open_time   : true,
+        slider_close_time  : true,
+        slider_opened_time : true,
+        slider_closed_time : true,
+        slider_opened_title: true,
+        slider_closed_title: true,
+
+        chat_model         : true,
+        poeple_model       : true,
+        set_chat_anchor    : true
+      },
+
+      
     },
     stateMap = { $container : null },
     jqueryMap = {},
@@ -44,13 +71,25 @@ spa.chat = (function () {
 
   // ---------------- BEGIN PUBLIC METHODS ----------------
   // Begin public method /configModule/
-  // Purpose   : Adjust configuration of allowed keys
-  // Arguments : A map of settable keys and values
-  //   * color_name - color ot use
-  // Settings  :
-  //   * configMap.settable_map declares allowed keys
+  // Example   : spa.chat.configModule({ slider_open_em : 18 });
+  // Purpose   : Configure the module prior to initialization
+  // Arguments :
+  //   * set_chat_anchor - a callback to modify the URI anchor to
+  //     indicate opened or closed state. This callback must return
+  //     false if the requested state cannot be met
+  //   * chat_model - the chat model object provides methods
+  //       to interact with our instant messaging
+  //   * people_model - the people model object which provides
+  //       methods to manage the list of people the model maintains
+  //   * slider_* settings. All these are optional scalars.
+  //       See mapConfig.settable_map for a full list
+  //       Example: slider_open_em is the open height in em's
+  // Action    :
+  //   The internal configuration data structure (configMap) is
+  //   updated with provided arguments. No other actions are taken.
   // Returns   : true
-  // Throws    : none
+  // Throws    : JavaScript error object and stack trace on
+  //             unacceptable or missing arguments
   //
   configModule = function ( input_map ) {
     spa.util.setConfigMap({

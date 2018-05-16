@@ -190,9 +190,9 @@ spa.shell = (function () {
     return bool_return;
   };
   // End DOM method /changeAnchorPart/
-  //-----------------END MDOM METHODS --------------
+  //-----------------END DOM METHODS --------------
 
-  //-----------------BEGIN EVENT HANDLES --------------
+  //-----------------BEGIN EVENT HANDLERS --------------
   // Begin Event handler /onHashchange/
   // Purpose  : Handles the hashchange event
   // Arguments:
@@ -255,10 +255,42 @@ spa.shell = (function () {
     return false;
   };
   // End Event handler /onClickChat/
-  //-----------------END EVENT HANDLES --------------
+  //-----------------END EVENT HANDLERS --------------
+
+  //---------------------- BEGIN CALLBACKS ---------------------
+  // Begin callback method /setChatAnchor/
+  // Example  : setChatAnchor( 'closed' );
+  // Purpose  : Change the chat component of the anchor
+  // Arguments:
+  //   * position_type - may be 'closed' or 'opened'
+  // Action   :
+  //   Changes the URI anchor parameter 'chat' to the requested
+  //   value if possible.
+  // Returns  :
+  //   * true  - requested anchor part was updated
+  //   * false - requested anchor part was not updated
+  // Throws   : none
+  //
+  
+  //----------------------- END CALLBACKS ----------------------
 
   //-----------------BEGIN PUBLIC METHODS --------------
   // Begin Public method /initmodule/
+  // Example  : spa.shell.initModule( $('#app_div_id') );
+  // Purpose  :
+  //   Directs the Shell to offer its capability to the user
+  // Arguments :
+  //   * $container (example: $('#app_div_id')).
+  //     A jQuery collection that should represent 
+  //     a single DOM container
+  // Action    :
+  //   Populates $container with the shell of the UI
+  //   and then configures and initializes feature modules.
+  //   The Shell is also responsible for browser-wide issues
+  //   such as URI anchor and cookie management.
+  // Returns   : none 
+  // Throws    : none
+  //
   initModule = function ( $container ) {
     // load HTML and map jQuery collectioins
     stateMap.$container = $container;
