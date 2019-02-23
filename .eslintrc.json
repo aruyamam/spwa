@@ -1,0 +1,14 @@
+{
+   "env": {
+      "browser": true
+   },
+   "parser": "babel-eslint",
+   "rules": {
+      "indent": ["error", 3, { "SwitchCase": 1}],
+      "brace-style": ["error", "stroustrup"],
+      "implicit-arrow-linebreak": ["off"]
+   },
+   "extends": [
+      "airbnb-base"
+   ]
+}
