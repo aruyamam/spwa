@@ -1,4 +1,4 @@
 import jQuery from 'jquery';
-import spa from './spa.shell';
+import spa from './spa';
 
-jQuery(document).ready(() => spa.initModule(jQuery('#spa')));
+jQuery(document).ready(() => spa.shell.initModule(jQuery('#spa')));
