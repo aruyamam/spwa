@@ -13,12 +13,17 @@ const configMap = {
       <div class="spa-shell-chat"></div>
       <div class="spa-shell-modal"></div>
    `,
-   chatExtendtime: 1000,
+   chatExtendTime: 1000,
    chatRetractTime: 300,
    chatExtendHeight: 450,
    chatRetreactHeight: 15,
+   chatExtendedTitle: 'Click to retract',
+   chatRetractedTitle: 'Click to extend',
 };
-const stateMap = { $container: null };
+const stateMap = {
+   $container: null,
+   isChatRetracted: true,
+};
 const jqueryMap = {};
 
 // ---------------------- BEGIN DOM METHODS ----------------
@@ -42,6 +47,9 @@ const setJqueryMap = () => {
 // Returns : boolean
 //  * true - slider animation activated
 //  * false - slider animation not activated
+// State : sets stateMap.isChatRetracted
+//  * true - slider is retracted
+//  * false - slider is extended
 //
 const toggleChat = (doExtend, callback) => {
    const pxChatHt = jqueryMap.$chat.height();
@@ -60,7 +68,10 @@ const toggleChat = (doExtend, callback) => {
          {
             height: configMap.chatExtendHeight,
          },
+         configMap.chatExtendTime,
          () => {
+            jqueryMap.$chat.attr('title', configMap.chatExtendedTitle);
+            stateMap.isChatRetracted = false;
             if (callback) {
                callback(jqueryMap.$chat);
             }
@@ -76,7 +87,10 @@ const toggleChat = (doExtend, callback) => {
       {
          height: configMap.chatRetreactHeight,
       },
+      configMap.chatRetractTime,
       () => {
+         jqueryMap.$chat.attr('title', configMap.chatRetractedTitle);
+         stateMap.isChatRetracted = true;
          if (callback) {
             callback(jqueryMap.$chat);
          }
@@ -86,8 +100,16 @@ const toggleChat = (doExtend, callback) => {
    return true;
    // End retract chat slider
 };
-
+// End DOM method /toggleChat/
 // ---------------------- END DOM METHODS ----------------
+
+// ---------------------- BEGIN EVENT HANDLER ----------------
+const onClickChat = () => {
+   toggleChat(stateMap.isChatRetracted);
+
+   return false;
+};
+// ---------------------- END EVENT HANDLER ----------------
 
 // ---------------------- BEGIN PUBLIC METHODS ----------------
 // Begin Public method /setJqueryMap/
@@ -96,9 +118,9 @@ const initModule = ($container) => {
    $container.html(configMap.mainHtml);
    setJqueryMap();
 
-   // test toggle
-   setTimeout(() => toggleChat(true), 3000);
-   setTimeout(() => toggleChat(false), 8000);
+   // initialize chat slider and bine click handler
+   stateMap.isChatRetracted = true;
+   jqueryMap.$chat.attr('title', configMap.chatRetractedTitle).click(onClickChat);
 };
 // End Public method /setJqueryMap/
 // ---------------------- END PUBLIC METHODS ----------------
