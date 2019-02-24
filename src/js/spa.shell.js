@@ -1,3 +1,5 @@
+import 'jquery.urianchor';
+
 const configMap = {
    mainHtml: `
       <div class="spa-shell-head">
@@ -105,7 +107,11 @@ const toggleChat = (doExtend, callback) => {
 
 // ---------------------- BEGIN EVENT HANDLER ----------------
 const onClickChat = () => {
-   toggleChat(stateMap.isChatRetracted);
+   if (toggleChat(stateMap.isChatRetracted)) {
+      $.uriAnchor.setAnchor({
+         chat: stateMap.isChatRetracted ? 'open' : 'closed',
+      });
+   }
 
    return false;
 };
