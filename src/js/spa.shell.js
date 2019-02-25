@@ -1,4 +1,5 @@
 import 'jquery.urianchor';
+import chat from './spa.chat';
 
 const configMap = {
    anchorSchemaMap: {
@@ -261,6 +262,10 @@ const initModule = ($container) => {
    $.uriAnchor.configModule({
       schema_map: configMap.anchorSchemaMap,
    });
+
+   // configure and initialize feature moudles
+   chat.configModule({});
+   chat.initModule(jqueryMap.$chat);
 
    // Handle URI anchor change events.
    // This is done /after/ all feature moudles are configured
