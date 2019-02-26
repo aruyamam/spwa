@@ -239,6 +239,7 @@ const initModule = ($appendTarget) => {
 
    // initialize chat slider to default title and state
    jqueryMap.$toggle.prop('title', configMap.sliderClosedTitle);
+   jqueryMap.$toggle.text('+');
    jqueryMap.$head.click(onClickToggle);
    stateMap.positionType = 'closed';
 
