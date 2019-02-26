@@ -2,3 +2,131 @@
  * spa.chat.scss
  * Chat feature styles
 */
+
+.spa-chat {
+   @at-root {
+      & {
+         position: absolute;
+         bottom: 0;
+         right: 0;
+         width: 25em;
+         height: 2em;
+         background-color: #fff;
+         border-radius: 0.5em 0 0 0;
+         border-style: solid;
+         border-width: thin 0 0 thin;
+         border-color: #888;
+         box-shadow: 0 0 0.75em 0 #888;
+         z-index: 1;
+      }
+
+      .spa-chat-head,
+      .spa-chat-closer {
+         position: absolute;
+         top: 0;
+         height: 2em;
+         line-height: 1.8em;
+         border-bottom: thin solid #888;
+         cursor: pointer;
+         background: #888;
+         color: #fff;
+         font-family: arial, helvetica, sans-serif;
+         font-weight: 800;
+         text-align: center;
+      }
+
+      .spa-chat-head {
+         left: 0;
+         right: 2em;
+         border-radius: 0.3em 0 0 0;
+
+         &__toggle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 2em;
+            border-radius: 0.3em 0 0 0;
+         }
+
+         &__title {
+            position: absolute;
+            left: 50%;
+            width: 16em;
+            margin-left: -8em;
+         }
+
+         &:hover .spa-chat-head__toggle {
+            background: #aaa;
+         }
+      }
+
+      .spa-chat-closer {
+         right: 0;
+         width: 2em;
+
+         &:hover {
+            background: #800;
+         }
+      }
+
+      .spa-chat-sizer {
+         position: absolute;
+         top: 2em;
+         left: 0;
+         right: 0;
+      }
+
+      .spa-chat-msgs {
+         position: absolute;
+         top: 1em;
+         left: 1em;
+         right: 1em;
+         bottom: 4em;
+         padding: 0.5em;
+         border-right: thin solid #888;
+         overflow-x: hidden;
+         overflow-y: scroll;
+      }
+
+      .spa-chat-box {
+         position: absolute;
+         left: 1em;
+         right: 1em;
+         bottom: 1em;
+         height: 2em;
+         background: #888;
+         border: thin solid #888;
+
+         & input[type=text] {
+            float: left;
+            width: 75%;
+            height: 100%;
+            padding: 0.5em;
+            background: #ddd;
+            color: #404040;
+            border: 0;
+
+            &:focus {
+               background: #fff;
+            }
+         }
+
+         & div {
+            float: left;
+            width: 25%;
+            height: 2em;
+            line-height: 1.9em;
+            text-align: center;
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+
+            &:hover {
+               background-color: #444;
+               color: #ff0;
+            }
+         }
+      }
+   }
+}

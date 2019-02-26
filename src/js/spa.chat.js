@@ -13,10 +13,10 @@ const configMap = {
                Chat
             </div>
          </div>
-         <div className="spa-chat-closer">x</div>
-         <div className="spa-chat-sizer">
-            <div className="spa-chat-msgs"></div>
-            <div className="spa-chat-box">
+         <div class="spa-chat-closer">x</div>
+         <div class="spa-chat-sizer">
+            <div class="spa-chat-msgs"></div>
+            <div class="spa-chat-box">
                <input type="text"/>
                <div>send</div>
             </div>
