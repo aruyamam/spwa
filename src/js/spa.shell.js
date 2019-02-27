@@ -8,6 +8,7 @@ const configMap = {
          closed: true,
       },
    },
+   resizeInterval: 200,
    mainHtml: `
       <div class="spa-shell-head">
          <div class="spa-shell-head-logo"></div>
@@ -29,7 +30,9 @@ const configMap = {
    chatRetractedTitle: 'Click to extend',
 };
 const stateMap = {
+   $container: undefined,
    anchorMap: {},
+   resizeIdto: undefined,
 };
 const jqueryMap = {};
 
@@ -177,6 +180,21 @@ const onHashchange = () => {
    return false;
 };
 // End Event handler /onHashchange/
+
+// Begin Event handler /onResize/
+const onResize = () => {
+   if (stateMap.resizeIdto) {
+      return true;
+   }
+
+   chat.handleResize();
+   stateMap.resizeIdto = setTimeout(() => {
+      stateMap.resizeIdto = undefined;
+   }, configMap.resizeInterval);
+
+   return true;
+};
+// End Event handler /onResize/
 // ---------------------- END EVENT HANDLER ----------------
 
 // ---------------------- BEGIN CALLBACKS ---------------------
@@ -237,6 +255,7 @@ const initModule = ($container) => {
    // is condiered on load
    //
    $(window)
+      .bind('resize', onResize)
       .bind('hashchange', onHashchange)
       .trigger('hashchange');
 };

@@ -39,12 +39,14 @@ const configMap = {
 
    sliderOpenTime: 250,
    sliderCloseTime: 250,
-   sliderOpenedEm: 16,
+   sliderOpenedEm: 18,
    sliderClosedEm: 2,
    sliderOpenedTitle: 'Click to close',
    sliderClosedTitle: 'Click to open',
+   sliderOpenedMinEm: 10,
+   windowHeightMinEm: 20,
 
-   chatMoel: null,
+   chatModel: null,
    peopleModel: null,
    setChatAnchor: null,
 };
@@ -84,8 +86,11 @@ const setJqueryMap = () => {
 // Begin DOM method /setPxSizes/
 const setPxSizes = () => {
    const pxPerEm = getEmSize(jqueryMap.$slider.get(0));
+   const windowHeightEm = Math.floor($(window).height() / pxPerEm + 0.5);
 
-   const openedHeightEm = configMap.sliderOpenedEm;
+   const openedHeightEm = windowHeightEm > configMap.windowHeightMinEm
+      ? configMap.sliderOpenedEm
+      : configMap.sliderOpenedMinEm;
 
    stateMap.pxPerEm = pxPerEm;
    stateMap.sliderClosedPx = configMap.sliderClosedEm * pxPerEm;
@@ -247,8 +252,75 @@ const initModule = ($appendTarget) => {
 };
 // End public method /initModule/
 
+// Begin public method /removeSlider/
+// Purpose    :
+//   * Removes chatSlider DOM element
+//   * Reverts to initial state
+//   * Removes pointers to callbacks and other data
+// Arguments  : none
+// Returns    : true
+// Throws     : none
+//
+const removeSlider = () => {
+   // unwind initializtion and state
+   // remove DOM container; this removes event bindings too
+   if (jqueryMap.$slider) {
+      jqueryMap.$slider.remove();
+      jqueryMap = {};
+   }
+   stateMap.$appendTarget = null;
+   stateMap.positionType = 'closed';
+
+   // unwind key configurations
+   configMap.chatModel = null;
+   configMap.peopleModel = null;
+   configMap.setChatAnchor = null;
+
+   return true;
+};
+// End public method /removeSlider/
+
+// Begin public method /handleResize/
+// Purpose    :
+//   Given a window resize event, adjust the presentation
+//   provided by this module if needed
+// Actions    :
+//   If the window height or width falls below
+//   a given threshold, resize the chat slider for the
+//   reduced window size.
+// Returns    : Boolean
+//   * false - resize not considered
+//   * true  - resize considered
+// Throws     : none
+//
+const handleResize = () => {
+   // don't do anything if we don't have a slider container
+   if (!jqueryMap.$slider) {
+      return false;
+   }
+
+   setPxSizes();
+   if (stateMap.positionType === 'opened') {
+      jqueryMap.$slider.css({
+         height: stateMap.sliderOpenedPx,
+      });
+   }
+
+   return true;
+};
+// End public method /handleResize/
+
+// window.chat = {
+//    removeSlider,
+//    configModule,
+//    initModule,
+//    setSliderPosition,
+// };
+
 export default {
    configModule,
+   handleResize,
    initModule,
+   removeSlider,
    setSliderPosition,
 };
