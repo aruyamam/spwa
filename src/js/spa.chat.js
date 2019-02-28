@@ -2,7 +2,7 @@
  * spa.chat.js
  * Chat feature module for SPA
  */
-import { setConfigMap } from './spa.util';
+import { setConfigMap } from './utils/spa.util';
 
 const configMap = {
    mainHtml: `
