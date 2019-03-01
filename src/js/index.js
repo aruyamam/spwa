@@ -1,3 +1,6 @@
 import spa from './spa';
 
-$(document).ready(() => spa.shell.initModule($('#spa')));
+$(document).ready(() => {
+   spa.model.initModule();
+   spa.shell.initModule($('#spa'));
+});
