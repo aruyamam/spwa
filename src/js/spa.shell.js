@@ -1,5 +1,6 @@
 import 'jquery.urianchor';
 import chat from './spa.chat';
+import model from './spa.model';
 
 const configMap = {
    anchorSchemaMap: {
@@ -11,12 +12,14 @@ const configMap = {
    resizeInterval: 200,
    mainHtml: `
       <div class="spa-shell-head">
-         <div class="spa-shell-head-logo"></div>
-         <div class="spa-shell-head-acct"></div>
-         <div class="spa-shell-head-search"></div>
+         <div class="spa-shell-head__logo">
+            <h1>SPA</h1>
+            <p>javascript end to end</p>
+         </div>
+         <div class="spa-shell-head__acct"></div>
       </div>
       <div class="spa-shell-main">
-         <div class="spa-shell-main-nav"></div>
+         <div class="spa-shell-main__nav"></div>
          <div class="spa-shell-main-content"></div>
       </div>
       <div class="spa-shell-foot"></div>
@@ -45,7 +48,12 @@ const copyAnchorMap = () => $.extend(true, {}, stateMap.anchorMap);
 // Begin DOM method /setJqueryMap/
 const setJqueryMap = () => {
    const { $container } = stateMap;
-   jqueryMap.$container = $container;
+
+   $.extend(jqueryMap, {
+      $container,
+      $acct: $container.find('.spa-shell-head__acct'),
+      $nav: $container.find('.spa-shell-main__nav'),
+   });
 };
 // End DOM method /setJqueryMap/
 
@@ -195,6 +203,28 @@ const onResize = () => {
    return true;
 };
 // End Event handler /onResize/
+
+const onTapAcct = () => {
+   const user = model.people.getUser();
+   if (user.getIsAnon()) {
+      const userName = prompt('Please sign-in');
+      model.people.login(userName);
+      jqueryMap.$acct.text('... processing ...');
+   }
+   else {
+      model.people.logout();
+   }
+
+   return false;
+};
+
+const onLogin = (event, loginUser) => {
+   jqueryMap.$acct.text(loginUser.name);
+};
+
+const onLogout = (event, logoutUser) => {
+   jqueryMap.$acct.text('Please sign-in');
+};
 // ---------------------- END EVENT HANDLER ----------------
 
 // ---------------------- BEGIN CALLBACKS ---------------------
@@ -245,6 +275,8 @@ const initModule = ($container) => {
    // configure and initialize feature moudles
    chat.configModule({
       setChatAnchor,
+      // chatModel: model.chat,
+      peopleModel: model.people,
    });
    chat.initModule(jqueryMap.$container);
 
@@ -258,6 +290,11 @@ const initModule = ($container) => {
       .bind('resize', onResize)
       .bind('hashchange', onHashchange)
       .trigger('hashchange');
+
+   $.gevent.subscribe($container, 'spa-login', onLogin);
+   $.gevent.subscribe($container, 'spa-logout', onLogout);
+
+   jqueryMap.$acct.text('Please sign-in').bind('utap', onTapAcct);
 };
 // End Public method /setJqueryMap/
 // ---------------------- END PUBLIC METHODS ----------------

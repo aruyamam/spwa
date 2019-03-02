@@ -15,14 +15,14 @@
    right: 0;
    height: 40px;
 }
-.spa-shell-head-logo {
+.spa-shell-head__logo {
    top: 4px;
    left: 4px;
    height: 32px;
    width: 128px;
    background: orange;
 }
-.spa-shell-head-acct {
+.spa-shell-head__acct {
    top: 4px;
    right: 0;
    width: 64px;
@@ -44,15 +44,15 @@
    right: 0;
 }
 .spa-shell-main-content,
-.spa-shell-main-nav {
+.spa-shell-main__nav {
    top: 0;
    bottom: 0;
 }
-.spa-shell-main-nav {
+.spa-shell-main__nav {
    width: 250px;
    background: #eee;
 }
-.spa-x-closed .spa-shell-main-nav {
+.spa-x-closed .spa-shell-main__nav {
    width: 0;
 }
 .spa-shell-main-content {
