@@ -9,7 +9,8 @@
       "indent": ["error", 3, { "SwitchCase": 1 }],
       "brace-style": ["error", "stroustrup"],
       "implicit-arrow-linebreak": ["off"],
-      "no-underscore-dangle": "off"
+      "no-underscore-dangle": "off",
+      "no-plusplus": "off"
    },
    "extends": ["airbnb-base"]
 }

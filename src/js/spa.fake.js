@@ -1,3 +1,7 @@
+let fakeIdSerial = 5;
+
+const makeFakeId = () => `id_${String(fakeIdSerial++)}`;
+
 const getPeopleList = () => [
    {
       name: 'Betty',
@@ -37,4 +41,31 @@ const getPeopleList = () => [
    },
 ];
 
-export default getPeopleList;
+const mockSio = () => {
+   const callbackMap = {};
+
+   const onSio = (msgType, callback) => {
+      callbackMap[msgType] = callback;
+   };
+
+   const emitSio = (msgType, data) => {
+      // respond to 'adduser' event with 'userupdate'
+      // callback after a 3s delay
+      //
+      if (msgType === 'adduser' && callbackMap.userupdate) {
+         setTimeout(() => {
+            callbackMap.userupdate([
+               {
+                  _id: makeFakeId(),
+                  name: data.name,
+                  cssMap: data.cssMap,
+               },
+            ]);
+         }, 3000);
+      }
+   };
+
+   return { emit: emitSio, on: onSio };
+};
+
+export default { getPeopleList, mockSio };
