@@ -1,4 +1,5 @@
 import 'jquery.urianchor';
+import 'jquery.event.ue';
 import chat from './spa.chat';
 import model from './spa.model';
 
@@ -20,7 +21,7 @@ const configMap = {
       </div>
       <div class="spa-shell-main">
          <div class="spa-shell-main__nav"></div>
-         <div class="spa-shell-main-content"></div>
+         <div class="spa-shell-main__content"></div>
       </div>
       <div class="spa-shell-foot"></div>
       <div class="spa-shell-modal"></div>

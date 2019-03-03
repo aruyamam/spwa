@@ -1,10 +1,10 @@
 .spa-shell-head,
-.spa-shell-head-logo,
-.spa-shell-head-acct,
+.spa-shell-head__logo,
+.spa-shell-head__acct,
 .spa-shell-head-search,
 .spa-shell-main,
-.spa-shell-main-nav,
-.spa-shell-main-content,
+.spa-shell-main__nav,
+.spa-shell-main__content,
 .spa-shell-foot,
 .spa-shell-modal {
    position: absolute;
@@ -17,17 +17,32 @@
 }
 .spa-shell-head__logo {
    top: 4px;
-   left: 4px;
+   left: 8px;
    height: 32px;
    width: 128px;
-   background: orange;
+
+   & h1 {
+      font: 800 22px/22px Arial, Helvetica, sans-serif;
+      margin: 0;
+   }
+
+   & p {
+      font: 800 10px/10px Arial, Helvetica, sans-serif;
+      margin: 0;
+   }
 }
 .spa-shell-head__acct {
    top: 4px;
    right: 0;
-   width: 64px;
+   width: 210px;
    height: 32px;
-   background: green;
+   line-height: 32px;
+   background: #888;
+   color: #fff;
+   text-align: center;
+   cursor: pointer;
+   overflow: hidden;
+   text-overflow: ellipsis;
 }
 .spa-shell-head-search {
    top: 4px;
@@ -43,20 +58,21 @@
    bottom: 40px;
    right: 0;
 }
-.spa-shell-main-content,
+.spa-shell-main__content,
 .spa-shell-main__nav {
    top: 0;
    bottom: 0;
 }
 .spa-shell-main__nav {
-   width: 250px;
+   width: 400px;
    background: #eee;
+   z-index: 1;
 }
 .spa-x-closed .spa-shell-main__nav {
    width: 0;
 }
-.spa-shell-main-content {
-   left: 250px;
+.spa-shell-main__content {
+   left: 400px;
    right: 0;
    background: #ddd;
 }
