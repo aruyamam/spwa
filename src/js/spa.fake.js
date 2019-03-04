@@ -2,7 +2,7 @@ let fakeIdSerial = 5;
 
 const makeFakeId = () => `id_${String(fakeIdSerial++)}`;
 
-const getPeopleList = () => [
+const peopleList = [
    {
       name: 'Betty',
       _id: 'id_01',
@@ -65,7 +65,24 @@ const mockSio = () => {
       }
    };
 
+   // Try once per second to use listchange callback.
+   // Stop trying after first success.
+   const sendListchange = () => {
+      let listchangeIdto = setTimeout(() => {
+         if (callbackMap.listchange) {
+            callbackMap.listchange([peopleList]);
+            listchangeIdto = undefined;
+         }
+         else {
+            sendListchange();
+         }
+      }, 1000);
+   };
+
+   // We have to start the process ...
+   sendListchange();
+
    return { emit: emitSio, on: onSio };
 };
 
-export default { getPeopleList, mockSio };
+export default { mockSio };
