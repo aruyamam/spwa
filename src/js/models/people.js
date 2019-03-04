@@ -1,24 +1,8 @@
-import 'jquery.event.gevent';
-import fake from './spa.fake';
-import data from './spa.data';
+import { configMap, isFakeData, stateMap } from './spa.model';
+import fake from '../spa.fake';
+import data from '../spa.data';
 
 const TAFFY = require('taffydb').taffy;
-
-/*
- * spa.model.js
- * Model module
- */
-
-const configMap = { anonId: 'a0' };
-const stateMap = {
-   anonUser: null,
-   cidSerial: 0,
-   peopleCidMap: {},
-   peopleDb: TAFFY(),
-   user: null,
-};
-
-const isFakeData = true;
 
 // The people object API
 // ---------------------
@@ -71,7 +55,7 @@ const personProto = {
 
 const makeCid = () => `c${String(stateMap.cidSerial++)}`;
 
-const clearPeopleDb = () => {
+export const clearPeopleDb = () => {
    const { user } = stateMap;
    stateMap.peopleDb = TAFFY();
    stateMap.peopleCidMap = {};
@@ -93,7 +77,7 @@ const completeLogin = (userList) => {
    $.gevent.publish('spa-login', [stateMap.user]);
 };
 
-const makePerson = (personMap) => {
+export const makePerson = (personMap) => {
    const {
       cid, cssMap, id, name,
    } = personMap;
@@ -183,30 +167,4 @@ const people = {
    },
 };
 
-const initModule = () => {
-   // initialize anonymous person
-   stateMap.anonUser = makePerson({
-      cid: configMap.anonId,
-      id: configMap.anonId,
-      name: 'anonymous',
-   });
-   stateMap.user = stateMap.anonUser;
-
-   if (isFakeData) {
-      const peopleList = fake.getPeopleList();
-      for (let i = 0; i < peopleList.length; i++) {
-         const personMap = peopleList[i];
-         makePerson({
-            cid: personMap._id,
-            cssMap: personMap.cssMap,
-            id: personMap._id,
-            name: personMap.name,
-         });
-      }
-   }
-};
-
-export default {
-   initModule,
-   people,
-};
+export default people;

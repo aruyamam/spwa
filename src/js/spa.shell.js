@@ -1,7 +1,7 @@
 import 'jquery.urianchor';
 import 'jquery.event.ue';
 import chat from './spa.chat';
-import model from './spa.model';
+import model from './models/spa.model';
 
 const configMap = {
    anchorSchemaMap: {
