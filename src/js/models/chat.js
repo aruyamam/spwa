@@ -14,22 +14,67 @@ import data from '../spa.data';
 //    for 'spa-listchange' and 'spa-updatechat' global
 //    custom events. If the current user is anonymous,
 //    join() aborts and returns false.
+//  * get_chatee() - return the person object with whom the user
+//    is chatting with. If there is no chatee, null is returned.
+//  * set_chatee( <person_id> ) - set the chatee to the person
+//    identified by person_id. If the person_id does not exist
+//    in the people list, the chatee is set to null. If the
+//    person requested is already the chatee, it returns false.
+//    It publishes a 'spa-setchatee' global custom event.
+//  * send_msg( <msg_text> ) - send a message to the chatee.
+//    It publishes a 'spa-updatechat' global custom event.
+//    If the user is anonymous or the chatee is null, it
+//    aborts and returns false.
 // ...
 //
 // jQuery global custom events published by the object include:
-// ...
+//  * spa-setchatee - This is published when a new chatee is
+//    set. A map of the form:
+//      { old_chatee : <old_chatee_person_object>,
+//        new_chatee : <new_chatee_person_object>
+//      }
+//    is provided as data.
 //  * spa-listchange - This is published when the list of
 //    online people changes in length (i.e. when a person
 //    joins or leaves a chat) or when their contents change
 //    (i.e. when a person's avatar details change).
 //    A subscriber to this event should get the people_db
 //    from the people model for the updated data.
-// ...
+//  * spa-updatechat - This is published when a new message
+//    is received or sent. A map of the form:
+//      { dest_id   : <chatee_id>,
+//        dest_name : <chatee_name>,
+//        sender_id : <sender_id>,
+//        msg_text  : <message_content>
+//      }
+//    is provided as data.
 //
+let chatee = null;
+
+const setChatee = (personId) => {
+   let newChatee = stateMap.peopleCidMap[personId];
+   if (newChatee) {
+      if (chatee && chatee.id === newChatee.id) {
+         return false;
+      }
+   }
+   else {
+      newChatee = null;
+   }
+
+   $.gevent.publish('spa-setchatee', {
+      oldChatee: chatee,
+      newChatee,
+   });
+   chatee = newChatee;
+
+   return true;
+};
 
 // Begin internal methods
 const _updateList = (argList) => {
    const peopleList = argList[0];
+   let isChateeOnline = false;
 
    clearPeopleDb();
 
@@ -53,25 +98,50 @@ const _updateList = (argList) => {
          name: personMap.name,
       };
 
+      if (chatee && chatee.id === makePersonMap.id) {
+         isChateeOnline = true;
+      }
       makePerson(makePersonMap);
    }
 
    stateMap.peopleDb.sort('name');
+
+   // If chatee is no longer online, we unset the chatee
+   // which triggers the 'spa-setchatee' global event
+   if (chatee && !isChateeOnline) {
+      setChatee('');
+   }
 };
 
 const _publishListchange = (argList) => {
    _updateList(argList);
    $.gevent.publish('spa-listchange', [argList]);
 };
+
+const _publishUpdatechat = (argList) => {
+   const msgMap = argList[0];
+
+   if (!chatee) {
+      setChatee(msgMap.senderId);
+   }
+   else if (msgMap.senderId !== stateMap.user.id && msgMap.senderId !== chatee.id) {
+      setChatee(msgMap.senderId);
+   }
+
+   $.gevent.publish('spa-updatechat', [msgMap]);
+};
 // End internal methods
 
 const _leaveChat = () => {
    const sio = isFakeData ? fake.mockSio() : data.getSio();
+   chatee = null;
    stateMap.isConnected = false;
    if (sio) {
       sio.emit('leavechat');
    }
 };
+
+const getChatee = () => chatee;
 
 const joinChat = () => {
    if (stateMap.isConnected) {
@@ -86,12 +156,40 @@ const joinChat = () => {
 
    const sio = isFakeData ? fake.mockSio() : data.getSio();
    sio.on('listchange', _publishListchange);
+   sio.on('updatechat', _publishUpdatechat);
    stateMap.isConnected = true;
+
+   return true;
+};
+
+const sendMsg = (msgText) => {
+   const sio = isFakeData ? fake.mockSio() : data.getSio();
+
+   if (!sio) {
+      return false;
+   }
+   if (!(stateMap.user && chatee)) {
+      return false;
+   }
+
+   const msgMap = {
+      destId: chatee.id,
+      destName: chatee.name,
+      senderId: stateMap.user.id,
+      msgText,
+   };
+
+   // we published updatechat so we can show our outgoing messages
+   _publishUpdatechat([msgMap]);
+   sio.emit('updatechat', msgMap);
 
    return true;
 };
 
 export default {
    _leave: _leaveChat,
+   getChatee,
    join: joinChat,
+   sendMsg,
+   setChatee,
 };

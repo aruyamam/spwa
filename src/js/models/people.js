@@ -1,6 +1,7 @@
 import { configMap, isFakeData, stateMap } from './spa.model';
 import fake from '../spa.fake';
 import data from '../spa.data';
+import chat from './chat';
 
 const TAFFY = require('taffydb').taffy;
 
@@ -72,7 +73,7 @@ const completeLogin = (userList) => {
    stateMap.user.id = userMap._id;
    stateMap.user.cssMap = userMap.cssMap;
    stateMap.peopleCidMap[userMap._id] = stateMap.user;
-
+   chat.login();
    // When we add chat, we should join here
    $.gevent.publish('spa-login', [stateMap.user]);
 };
@@ -156,8 +157,8 @@ const people = {
 
    logout() {
       const { user } = stateMap;
-      // when we add chat, we should leave the chatroom here
 
+      chat._leave();
       const isRemoved = removePerson(user);
       stateMap.user = stateMap.anonUser;
 
