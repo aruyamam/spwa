@@ -73,7 +73,7 @@ const completeLogin = (userList) => {
    stateMap.user.id = userMap._id;
    stateMap.user.cssMap = userMap.cssMap;
    stateMap.peopleCidMap[userMap._id] = stateMap.user;
-   chat.login();
+   chat.join();
    // When we add chat, we should join here
    $.gevent.publish('spa-login', [stateMap.user]);
 };
@@ -138,7 +138,7 @@ const people = {
    },
 
    login(name) {
-      const sio = isFakeData ? fake.mockSio() : data.getSio();
+      const sio = isFakeData ? fake.mockSio : data.getSio();
 
       stateMap.user = makePerson({
          cid: makeCid(),

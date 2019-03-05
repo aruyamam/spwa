@@ -133,7 +133,7 @@ const _publishUpdatechat = (argList) => {
 // End internal methods
 
 const _leaveChat = () => {
-   const sio = isFakeData ? fake.mockSio() : data.getSio();
+   const sio = isFakeData ? fake.mockSio : data.getSio();
    chatee = null;
    stateMap.isConnected = false;
    if (sio) {
@@ -154,7 +154,7 @@ const joinChat = () => {
       return false;
    }
 
-   const sio = isFakeData ? fake.mockSio() : data.getSio();
+   const sio = isFakeData ? fake.mockSio : data.getSio();
    sio.on('listchange', _publishListchange);
    sio.on('updatechat', _publishUpdatechat);
    stateMap.isConnected = true;
@@ -163,7 +163,7 @@ const joinChat = () => {
 };
 
 const sendMsg = (msgText) => {
-   const sio = isFakeData ? fake.mockSio() : data.getSio();
+   const sio = isFakeData ? fake.mockSio : data.getSio();
 
    if (!sio) {
       return false;
