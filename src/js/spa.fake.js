@@ -93,6 +93,19 @@ const mockSio = (function mockSio() {
          }
          sendListchange();
       }
+
+      // simulate send of 'updateavatar' message and data to server
+      if (msgType === 'updateavatar' && callbackMap.listchange) {
+         // simulate receipt of 'listchange' message
+         for (let i = 0; i < peopleList.length; i++) {
+            if (peopleList[i]._id === data.personId) {
+               peopleList[i].cssMap = data.cssMap;
+               break;
+            }
+         }
+         // execute callback for the 'listchange' message
+         callbackMap.listchange([peopleList]);
+      }
    };
 
    const emitMockMsg = () => {

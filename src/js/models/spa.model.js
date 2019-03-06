@@ -31,13 +31,6 @@ const initModule = () => {
    stateMap.user = stateMap.anonUser;
 };
 
-window.$ = $;
-window.model = {
-   initModule,
-   chat,
-   people,
-};
-
 export default {
    initModule,
    chat,
