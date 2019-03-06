@@ -101,9 +101,11 @@ const _updateList = (argList) => {
          id: personMap._id,
          name: personMap.name,
       };
+      const person = makePerson(makePersonMap);
 
       if (chatee && chatee.id === makePersonMap.id) {
          isChateeOnline = true;
+         chatee = person;
       }
       makePerson(makePersonMap);
    }

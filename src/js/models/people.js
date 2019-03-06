@@ -74,7 +74,6 @@ const completeLogin = (userList) => {
    stateMap.user.cssMap = userMap.cssMap;
    stateMap.peopleCidMap[userMap._id] = stateMap.user;
    chat.join();
-   // When we add chat, we should join here
    $.gevent.publish('spa-login', [stateMap.user]);
 };
 
@@ -159,12 +158,10 @@ const people = {
       const { user } = stateMap;
 
       chat._leave();
-      const isRemoved = removePerson(user);
       stateMap.user = stateMap.anonUser;
+      clearPeopleDb();
 
       $.gevent.publish('spa-logout', [user]);
-
-      return isRemoved;
    },
 };
 
