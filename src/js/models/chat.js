@@ -25,7 +25,11 @@ import data from '../spa.data';
 //    It publishes a 'spa-updatechat' global custom event.
 //    If the user is anonymous or the chatee is null, it
 //    aborts and returns false.
-// ...
+//    joins or leaves a chat) or when their contents change
+//    'spa-listchange' event which publishes the updated
+//    people list and avatar information (the css_map in the
+//    person objects). The update_avtr_map must have the form
+//    { person_id : person_id, css_map : css_map }.
 //
 // jQuery global custom events published by the object include:
 //  * spa-setchatee - This is published when a new chatee is
@@ -186,10 +190,24 @@ const sendMsg = (msgText) => {
    return true;
 };
 
+// avatar_update_map should have the form:
+// { person_id : <string>, css_map : {
+//   top : <int>, left : <int>,
+//   'background-color' : <string>
+// }};
+//
+const updateAvatar = (avatarUpdateMap) => {
+   const sio = isFakeData ? fake.mockSio : data.getSio();
+   if (sio) {
+      sio.emit('updateavatar', avatarUpdateMap);
+   }
+};
+
 export default {
    _leave: _leaveChat,
    getChatee,
    join: joinChat,
    sendMsg,
    setChatee,
+   updateAvatar,
 };
