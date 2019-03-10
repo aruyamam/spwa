@@ -107,7 +107,6 @@ const _updateList = (argList) => {
          isChateeOnline = true;
          chatee = person;
       }
-      makePerson(makePersonMap);
    }
 
    stateMap.peopleDb.sort('name');

@@ -47,7 +47,7 @@ const TAFFY = require('taffydb').taffy;
 //
 const personProto = {
    getIsUser() {
-      return this.cid === stateMap.anonUser.cid;
+      return this.cid === stateMap.user.cid;
    },
    getIsAnon() {
       return this.cid === stateMap.anonUser.cid;

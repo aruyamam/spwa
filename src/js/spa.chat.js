@@ -3,6 +3,7 @@
  * Chat feature module for SPA
  */
 import { setConfigMap } from './utils/spa.util';
+import { encodeHtml, getEmSize } from './utils/spa.util_b';
 
 const configMap = {
    mainHtml: `
@@ -15,10 +16,20 @@ const configMap = {
          </div>
          <div class="spa-chat-closer">x</div>
          <div class="spa-chat-sizer">
-            <div class="spa-chat-msgs"></div>
-            <div class="spa-chat-box">
-               <input type="text"/>
-               <div>send</div>
+            <div class="spa-chat-list">
+               <div class="spa-chat-list__box"></div>
+            </div>
+            <div class="spa-chat-msg">
+               <div class="spa-chat-msg__log"></div>
+               <div class="spa-chat-msg__in">
+                  <form class="spa-chat-msg__form">
+                     <input type="text"/>
+                     <input type="submit" style="display:none" />
+                     <div class="spa-chat-msg__send">
+                        send
+                     </div>
+                  </form>
+               </div>
             </div>
          </div>
       </div>
@@ -41,8 +52,8 @@ const configMap = {
    sliderCloseTime: 250,
    sliderOpenedEm: 18,
    sliderClosedEm: 2,
-   sliderOpenedTitle: 'Click to close',
-   sliderClosedTitle: 'Click to open',
+   sliderOpenedTitle: 'Tap to close',
+   sliderClosedTitle: 'Tap to open',
    sliderOpenedMinEm: 10,
    windowHeightMinEm: 20,
 
@@ -61,7 +72,6 @@ const stateMap = {
 let jqueryMap = {};
 
 // ------------------- BEGIN UTILITY METHODS ------------------
-const getEmSize = elem => Number(getComputedStyle(elem, '').fontSize.match(/\d*\.?\d*/)[0]);
 // -------------------- END UTILITY METHODS -------------------
 
 // --------------------- BEGIN DOM METHODS --------------------
@@ -76,9 +86,13 @@ const setJqueryMap = () => {
       $toggle: $slider.find('.spa-chat-head__toggle'),
       $title: $slider.find('.spa-chat-head__title'),
       $sizer: $slider.find('.spa-chat-sizer'),
-      $msgs: $slider.find('.spa-chat-msgs'),
-      $box: $slider.find('.spa-chat-box'),
-      $input: $slider.find('.spa-chat-input input[type=text]'),
+      $listBox: $slider.find('.spa-chat-list__box'),
+      $msgLog: $slider.find('.spa-chat-msg__log'),
+      $msgIn: $slider.find('.spa-chat-msg__in'),
+      $input: $slider.find('.spa-chat-msg__in input[type=text]'),
+      $send: $slider.find('.spa-chat-msg__send'),
+      $form: $slider.find('.spa-chat-msg__form'),
+      $window: $(window),
    };
 };
 // End DOM method /setJqueryMap/
@@ -86,7 +100,7 @@ const setJqueryMap = () => {
 // Begin DOM method /setPxSizes/
 const setPxSizes = () => {
    const pxPerEm = getEmSize(jqueryMap.$slider.get(0));
-   const windowHeightEm = Math.floor($(window).height() / pxPerEm + 0.5);
+   const windowHeightEm = Math.floor(jqueryMap.$window.height() / pxPerEm + 0.5);
 
    const openedHeightEm = windowHeightEm > configMap.windowHeightMinEm
       ? configMap.sliderOpenedEm
@@ -125,8 +139,19 @@ const setSliderPosition = (positionType, callback) => {
    let sliderTitle;
    let toggleText;
 
+   // position type of 'opened' is not allowed for anon user
+   // therefore we simply return flase; the shell will fix the
+   // uri and try again.
+   if (positionType === 'opened' && configMap.peopleModel.getUser().getIsAnon()) {
+      return false;
+   }
+
    // return true if slider already in requested position
    if (stateMap.positionType === positionType) {
+      if (positionType === 'opened') {
+         jqueryMap.$input.focus();
+      }
+
       return true;
    }
 
@@ -137,6 +162,7 @@ const setSliderPosition = (positionType, callback) => {
          animateTime = configMap.sliderOpenTime;
          sliderTitle = configMap.sliderOpenedTitle;
          toggleText = '=';
+         jqueryMap.$input.focus();
          break;
 
       case 'hidden':
@@ -172,10 +198,45 @@ const setSliderPosition = (positionType, callback) => {
    return true;
 };
 // End public DOM method /setSliderPosition/
+
+// Begin private DOM methods to manage chat message
+const scrollChat = () => {
+   const { $msgLog } = jqueryMap;
+   $msgLog.animate(
+      {
+         scrollTop: $msgLog.prop('scrollHieght') - $msgLog.height(),
+      },
+      150,
+   );
+};
+
+const writeChat = (personName, text, isUser) => {
+   const msgClass = isUser ? 'spa-chat-msg__log-me' : 'spa-chat-msg__log-msg';
+
+   jqueryMap.$msgLog.append(`
+      <div class="${msgClass}">
+         ${encodeHtml(personName)}: ${encodeHtml(text)}
+      </div>
+   `);
+
+   scrollChat();
+};
+
+const writeAlert = (alertText) => {
+   jqueryMap.$msgLog.append(`
+      <div class="spa-chat-msg__log-alert">
+         ${encodeHtml(alertText)}
+      </div>
+   `);
+   scrollChat();
+};
+
+const clearChat = () => jqueryMap.$msgLog.empty();
+// End private DOM methods to manage chat message
 // ---------------------- END DOM METHODS ---------------------
 
 // ------------------- BEGIN EVENT HANDLERS -------------------
-const onClickToggle = () => {
+const onTapToggle = () => {
    const { setChatAnchor } = configMap;
    if (stateMap.positionType === 'opened') {
       setChatAnchor('closed');
@@ -185,6 +246,137 @@ const onClickToggle = () => {
    }
 
    return false;
+};
+
+const onSubmitMsg = (event) => {
+   const msgText = jqueryMap.$input.val();
+   if (msgText.trim() === '') {
+      return false;
+   }
+   configMap.chatModel.sendMsg(msgText);
+   jqueryMap.$input.focus();
+   jqueryMap.$send.addClass('spa-x-select');
+   setTimeout(() => {
+      jqueryMap.$send.removeClass('spa-x-select');
+   }, 250);
+
+   return false;
+};
+
+const onTapList = (event) => {
+   const $tapped = $(event.elem_target);
+   if (!$tapped.hasClass('spa-chat-list__name')) {
+      return false;
+   }
+
+   const chateeId = $tapped.attr('data-id');
+   if (!chateeId) {
+      return false;
+   }
+
+   configMap.chatModel.setChatee(chateeId);
+
+   return false;
+};
+
+const onSetchatee = (event, argMap) => {
+   const { newChatee, oldChatee } = argMap;
+
+   jqueryMap.$input.focus();
+   if (!newChatee) {
+      if (oldChatee) {
+         writeAlert(`${oldChatee.name} has left the chat`);
+      }
+      else {
+         writeAlert('Your friend has left the chat');
+      }
+      jqueryMap.$title.text('Chat');
+
+      return false;
+   }
+
+   jqueryMap.$listBox
+      .find('.spa-chat-list__name')
+      .removeClass('spa-x-select')
+      .end()
+      .find(`[data-id="${argMap.newChatee.id}"]`)
+      .addClass('spa-x-select');
+
+   writeAlert(`Now chatting with ${argMap.newChatee.name}`);
+   jqueryMap.$title.text(`Chat with ${argMap.newChatee.name}`);
+
+   return true;
+};
+
+const onListchange = (event) => {
+   let listHtml = String();
+   const peopleDb = configMap.peopleModel.getDB();
+   const chatee = configMap.chatModel.getChatee();
+
+   peopleDb().each((person, idx) => {
+      let selectClass = '';
+
+      if (person.getIsAnon() || person.getIsUser()) {
+         return true;
+      }
+
+      if (chatee && chatee.id === person.id) {
+         selectClass = 'spa-x-select';
+      }
+
+      listHtml += `
+      <div class="spa-chat-list__name${selectClass}" data-id="${person.id}">
+         ${encodeHtml(person.name)}
+      </div>
+     `;
+   });
+
+   if (!listHtml) {
+      listHtml = `
+         <div class="spa-chat-list__note">
+            To chat alone is the fate of all great souls ...
+            <br><br>
+            No one is online
+         </div>
+      `;
+      clearChat();
+   }
+   jqueryMap.$listBox.html(listHtml);
+};
+
+const onUpdatechat = (event, msgMap) => {
+   const { senderId, msgText } = msgMap;
+   const chatee = configMap.chatModel.getChatee() || {};
+   const sender = configMap.peopleModel.getByCid(senderId);
+
+   if (!sender) {
+      writeAlert(msgText);
+
+      return false;
+   }
+
+   const isUser = sender.getIsUser();
+
+   if (!(isUser || senderId === chatee.id)) {
+      configMap.chatModel.setChatee(senderId);
+   }
+
+   writeChat(sender.name, msgText, isUser);
+
+   if (isUser) {
+      jqueryMap.$input.val('');
+      jqueryMap.$input.focus();
+   }
+};
+
+const onLogin = (event, loginUser) => {
+   configMap.setChatAnchor('opened');
+};
+
+const onLogout = (event, logoutUser) => {
+   configMap.setChatAnchor('closed');
+   jqueryMap.$title.text('Chat');
+   clearChat();
 };
 // -------------------- END EVENT HANDLERS --------------------
 
@@ -237,18 +429,30 @@ const configModule = (inputMap) => {
 // Throws     : none
 //
 const initModule = ($appendTarget) => {
-   $appendTarget.append(configMap.mainHtml);
+   // load chat slider html and jquery cache
    stateMap.$appendTarget = $appendTarget;
+   $appendTarget.append(configMap.mainHtml);
    setJqueryMap();
    setPxSizes();
 
    // initialize chat slider to default title and state
    jqueryMap.$toggle.prop('title', configMap.sliderClosedTitle);
    jqueryMap.$toggle.text('+');
-   jqueryMap.$head.click(onClickToggle);
    stateMap.positionType = 'closed';
 
-   return true;
+   // Have $listBox subscribe to jQuery global events
+   const { $listBox } = jqueryMap;
+   $.gevent.subscribe($listBox, 'spa-listchange', onListchange);
+   $.gevent.subscribe($listBox, 'spa-setchatee', onSetchatee);
+   $.gevent.subscribe($listBox, 'spa-updatechat', onUpdatechat);
+   $.gevent.subscribe($listBox, 'spa-login', onLogin);
+   $.gevent.subscribe($listBox, 'spa-logout', onLogout);
+
+   // bind user input events
+   jqueryMap.$head.bind('utap', onTapToggle);
+   jqueryMap.$listBox.bind('utap', onTapList);
+   jqueryMap.$send.bind('utap', onSubmitMsg);
+   jqueryMap.$form.bind('submit', onSubmitMsg);
 };
 // End public method /initModule/
 
@@ -309,13 +513,6 @@ const handleResize = () => {
    return true;
 };
 // End public method /handleResize/
-
-// window.chat = {
-//    removeSlider,
-//    configModule,
-//    initModule,
-//    setSliderPosition,
-// };
 
 export default {
    configModule,

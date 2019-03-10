@@ -10,6 +10,15 @@ ol, ul, dl {
    list-style-position: inside;
 }
 
+* {
+   user-select: none;
+   user-drag: none;
+}
+
+input, textarea, .spa-x-user-select {
+   user-select: text;
+}
+
 body {
    font: 10pt 'Trebuchet MS', Verdana, Helvetica, Arial, sans-serif;
    color: #444;

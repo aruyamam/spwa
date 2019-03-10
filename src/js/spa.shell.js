@@ -26,12 +26,6 @@ const configMap = {
       <div class="spa-shell-foot"></div>
       <div class="spa-shell-modal"></div>
    `,
-   chatExtendTime: 1000,
-   chatRetractTime: 300,
-   chatExtendHeight: 450,
-   chatRetreactHeight: 15,
-   chatExtendedTitle: 'Click to retract',
-   chatRetractedTitle: 'Click to extend',
 };
 const stateMap = {
    $container: undefined,
@@ -276,7 +270,7 @@ const initModule = ($container) => {
    // configure and initialize feature moudles
    chat.configModule({
       setChatAnchor,
-      // chatModel: model.chat,
+      chatModel: model.chat,
       peopleModel: model.people,
    });
    chat.initModule(jqueryMap.$container);
