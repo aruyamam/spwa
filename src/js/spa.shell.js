@@ -2,6 +2,7 @@ import 'jquery.urianchor';
 import 'jquery.event.ue';
 import chat from './spa.chat';
 import model from './models/spa.model';
+import avtr from './spa.avtr';
 
 const configMap = {
    anchorSchemaMap: {
@@ -274,6 +275,12 @@ const initModule = ($container) => {
       peopleModel: model.people,
    });
    chat.initModule(jqueryMap.$container);
+
+   avtr.configModule({
+      chatModel: model.chat,
+      peopleModel: model.people,
+   });
+   avtr.initModule(jqueryMap.$nav);
 
    // Handle URI anchor change events.
    // This is done /after/ all feature moudles are configured
